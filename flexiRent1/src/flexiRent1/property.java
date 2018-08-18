@@ -26,7 +26,7 @@ public abstract class property implements rentable, maintenable{
 	
 	private String lastMaintenanceDate;		// using DateTime class but making string to save
 	
-	protected rentalRecord[] records = new rentalRecord[2];
+	protected rentalRecord[] records = new rentalRecord[10];
 	
 	/**
 	 * @param property_id

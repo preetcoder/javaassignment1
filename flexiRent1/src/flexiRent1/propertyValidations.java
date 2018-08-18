@@ -205,7 +205,19 @@ public class propertyValidations {
 			}
 		}
 		
+		else if(arr instanceof flexiRent1.rentalRecord[]) {
+			for(int i = 0; i<arr.length; i++) {
+				
+			    if(arr[i] == null)
+			    {
+			        openArray = i;
+			        break;
+			    }
+			}
+		}
+		
 		else {
+			
 			for(int i = 0; i<arr.length; i++) {
 							
 						    if(arr[i] == null)
@@ -264,7 +276,7 @@ public class propertyValidations {
 			
 			    if(proID.equals(allProperties[i].getProperty_id()))
 			    {
-			    	System.out.println(proID);
+			    	//System.out.println(proID);
 			    	if("status".equals(val)) {
 				        // get property status and return
 				    	return allProperties[i].getProperty_status() ;
@@ -272,7 +284,7 @@ public class propertyValidations {
 			    	else if("maintenancedate".equals(val)) {
 			    		// get property last maintenance status and return
 			    		
-			    		System.out.println(allProperties[i].getLastMaintenanceDate() );
+			    		//System.out.println(allProperties[i].getLastMaintenanceDate() );
 			    		
 			    		return allProperties[i].getLastMaintenanceDate() ;
 			    		
@@ -280,6 +292,10 @@ public class propertyValidations {
 			    	else if("index".equals(val)) {
 			    		// returning index value after [parsing
 			    		return Integer.toString(i);
+			    	}
+			    	
+			    	else if("latestrent".equals(val)) {
+			    		return allProperties[i].records[0].getRentDate();
 			    	}
 			    }
 		
@@ -295,7 +311,7 @@ public class propertyValidations {
 		return input;
 	}
 	
-	public String addRentDate(String propID) {
+	public String addRentDate(String propID, String val) {
 		String inputDate;
 		
 		boolean rentDate_valid = true; 
@@ -303,7 +319,7 @@ public class propertyValidations {
 		
 		
 		do {
-			System.out.println("Rent date (dd/mm/yyyy)");
+			System.out.println(val +" date (dd/mm/yyyy)");
 			
 			inputDate = userInput();
 			
@@ -312,7 +328,7 @@ public class propertyValidations {
 				rentDate_valid = false;
 			}
 			else {
-				System.out.println("Date must be correct and in dd/mm/yyyy format.");
+				System.out.println("Date must be correct, greater than today date and in dd/mm/yyyy format.");
 				
 				
 			}
@@ -331,7 +347,26 @@ public class propertyValidations {
 				
 				if(obj.dateValidate(rentDate)) {
 					
-					return true;
+					// if rent date is greater than or equal to current date
+					String[] rentDateparts = rentDate.split("/");
+					
+					String[] currentDate = obj.getFormattedDate().split("/");
+					
+					DateTime rentDateobj = new DateTime(Integer.parseInt(rentDateparts[0]), Integer.parseInt(rentDateparts[1]), Integer.parseInt(rentDateparts[2]));
+					
+					DateTime currentDateobj = new DateTime(Integer.parseInt(currentDate[0]), Integer.parseInt(currentDate[1]), Integer.parseInt(currentDate[2]));
+					
+					// equal or greater than todays date
+					if(obj.diffDays(rentDateobj, currentDateobj) >= 0) {
+						//System.out.println(obj.diffDays(rentDateobj, currentDateobj));
+						return true;
+					}
+					else {
+						//System.out.println(obj.diffDays(rentDateobj, currentDateobj));
+						return false;
+					}
+					
+					
 					
 				}
 				

@@ -80,11 +80,11 @@ public class apartment extends property{
 				
 				// adding value to 0 index
 				this.records[0] = new rentalRecord(recordId,rentDate.toString(),customerId, estdReturnDate);
-				//this.setProperty_status("rented");
+				this.setProperty_status("rented");
 				//System.out.println(this.getProperty_type() + " " + this.getProperty_id() +" is now rented by customer "+ customerId );
 				
 				// get property index
-				System.out.println(this.toString());
+				//System.out.println(this.toString());
 				return true;
 			}
 			else {
@@ -98,9 +98,9 @@ public class apartment extends property{
 				this.records[0] = new rentalRecord(recordId,rentDate.toString(),customerId, estdReturnDate);
 				
 				// set status to rented
-				//this.setProperty_status("rented");
+				this.setProperty_status("rented");
 				// get property index
-				System.out.println(this.toString());
+				//System.out.println(this.getDetails());
 				
 				return true;
 			}
@@ -118,7 +118,110 @@ public class apartment extends property{
 	 */
 	@Override
 	public boolean returnProperty(DateTime returnDate) {
-		// TODO Auto-generated method stub
+		// revalidating again
+		
+		// get latest rent date of this property 
+		
+		String latestRentDate = this.records[0].getRentDate();
+		
+		// get estimated date so you can find late fee fine if any
+		String latestEstdDate = this.records[0].getEstReturnDate();
+		
+		DateTime dateobj = new DateTime();
+		
+		double totalprice = 0, lateFine = 0;
+		
+		if(dateobj.compareDates(returnDate.toString(), latestRentDate)) {
+			//System.out.println("you can rent me");
+			// converting both dates to DateTime so can find the difference in days
+			
+			String[] latestrentparts = latestRentDate.split("/");
+			
+			String[] latestEstdDateparts = latestEstdDate.split("/");
+			
+			
+			DateTime datelatestRent = new DateTime(Integer.parseInt(latestrentparts[0]), Integer.parseInt(latestrentparts[1]), Integer.parseInt(latestrentparts[2]));
+			
+			DateTime datelatestEstdDateparts = new DateTime(Integer.parseInt(latestEstdDateparts[0]), Integer.parseInt(latestEstdDateparts[1]), Integer.parseInt(latestEstdDateparts[2]));
+			
+			// got difference b/w rent and actual date 
+			int rent_to_actual_diff = dateobj.diffDays(returnDate, datelatestRent);
+			
+			// got difference b/w estd and actual return date
+			int estd_to_actual_diff = dateobj.diffDays(returnDate, datelatestEstdDateparts);
+			
+			// got difference b/w estd and rent return date
+						int estd_to_rent_diff = dateobj.diffDays(datelatestRent, datelatestEstdDateparts);
+						
+			
+			// rent date is less than actual return date
+			if(rent_to_actual_diff > 0) {
+				
+				
+				// check apartment no_of_bedrooms
+				
+				String no_of_beds = this.getNo_of_beds();
+				int beds = Integer.parseInt(no_of_beds);
+				
+				
+				
+				if(estd_to_actual_diff > 0) {
+					// property left after estd return date so fine
+					
+					// property on time or before returning
+					System.out.println("Fine");
+					if(beds == 1) {
+						
+						// multiplying to 143 for....
+						 totalprice = (estd_to_rent_diff * 143) ;
+						 lateFine =  ((115/100.0f)*143 * estd_to_actual_diff );
+					}
+					
+					else if(beds == 2) {
+						totalprice = (estd_to_rent_diff * 210) ;
+						 lateFine =  (((115/100.0f)*210) * estd_to_actual_diff );
+						 System.out.println(estd_to_actual_diff + "-------"+lateFine);
+					}
+					else if(beds == 3) {
+						totalprice = (estd_to_rent_diff * 319) ;
+						 lateFine =  ((115/100.0f)*319 * estd_to_actual_diff );
+					}
+					
+					
+				}
+				else {
+					// property on time or before returning
+					if(beds == 1) {
+						 totalprice = rent_to_actual_diff * 143;
+					}
+					
+					else if(beds == 2) {
+						totalprice = rent_to_actual_diff * 210;
+					}
+					else if(beds == 3) {
+						totalprice = rent_to_actual_diff * 319;
+					}
+					
+				}
+				
+				// setting instance variables
+				
+				this.records[0].setRentFee(totalprice);
+				this.records[0].setLateFee(lateFine);
+				this.records[0].setActReturnDate(returnDate.toString());
+				
+				this.setProperty_status("available");
+				
+				return true;
+				
+				
+			}
+			else {
+				return false;
+			}
+			
+		}
+		
 		return false;
 	}
 
@@ -127,7 +230,33 @@ public class apartment extends property{
 	 */
 	@Override
 	public boolean performMaintenance() {
-		// TODO Auto-generated method stub
+		
+		// revalidating
+		// getting all properties
+		flexiRentsystem obj = new flexiRentsystem();
+		
+		property[] allprop = obj.getProperties();
+		
+		// passing values to validation class for validating data
+		propertyValidations valid = new propertyValidations();
+		
+				// property found. check status
+		
+		String InputpropertyStaus = valid.checkPropertyAvailableStatus(allprop, this.getProperty_id(), "status");
+		
+		// if available only then set to maintenance
+		
+		if("available".equals(InputpropertyStaus)) {
+			
+			// set status to maintenance
+			this.setProperty_status("maintenance");
+			
+			return true;
+			
+		}
+		
+		
+		
 		return false;
 	}
 
@@ -137,8 +266,36 @@ public class apartment extends property{
 	 */
 	@Override
 	public String getDetails() {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("************************************");
+		if("available".equals(this.getProperty_status())) {
+			System.out.println("A new Apartment is available for rent.");
+		}
+		propertyValidations valid = new propertyValidations();
+		
+		int len = valid.arrayFreeIndex(this.getRecords());
+		String rental_record_string = "";
+		String property_details = "";
+		if(len > 0) {
+			for(int i = 0;i<len;i++) {
+				rental_record_string += this.records[i].getDetails() + "\n----------------------------\n";
+				
+			}
+		}
+		
+		if(len>0) {
+			 property_details = "Property ID:" + this.getProperty_id() +"\n Address : "+ this.getStreet_no() + " "+ this.getStreet_name()+ " "
+					+ this.getSuburb() + "\n Type : " + this.getProperty_type() + "\n Bedroom : " + this.getNo_of_beds() + "\n Status: "+this.getProperty_status()
+					+"\n Rental Record \n-------------------\n"+rental_record_string;
+		}else {
+			 property_details = "Property ID:" + this.getProperty_id() +"\n Address : "+ this.getStreet_no() + " "+ this.getStreet_name()+ " "
+					+ this.getSuburb() + "\n Type : " + this.getProperty_type() + "\n Bedroom : " + this.getNo_of_beds() + "\n Status: "+this.getProperty_status()
+					+"\n Rental Record : empty";
+		}
+		
+		System.out.println("************************************");
+		
+		return property_details;
+		
 	}
 
 
@@ -158,7 +315,35 @@ public class apartment extends property{
 
 	@Override
 	public boolean completeMaintenance(DateTime completionDate) {
-		// TODO Auto-generated method stub
+		// revalidating
+		
+		// getting all properties
+		flexiRentsystem obj = new flexiRentsystem();
+				
+		property[] allprop = obj.getProperties();
+				
+		// passing values to validation class for validating data
+		propertyValidations valid = new propertyValidations();
+		
+		String InputpropertyStaus = valid.checkPropertyAvailableStatus(allprop, this.getProperty_id(), "status");
+		if("maintenance".equals(InputpropertyStaus)) {
+			
+			// get last maintenance date of property so validate
+			String property_last_maintenance_date = valid.checkPropertyAvailableStatus(allprop, this.getProperty_id(), "maintenancedate");
+			
+			DateTime dateobj = new DateTime();
+			if(dateobj.compareDates(completionDate.toString(), property_last_maintenance_date)) {
+				
+				// set availabe status
+				this.setProperty_status("available");
+				
+				// set last maintenance date
+				this.setLastMaintenanceDate(completionDate.toString());
+				
+				return true;
+			}
+			
+		}
 		return false;
 	}
 

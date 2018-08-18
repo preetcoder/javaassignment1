@@ -150,7 +150,15 @@ public class rentalRecord {
 	}
 
 	public String getDetails() {
-		return null;
+		String rentalRecordDetails;
+		if("".equals(this.getActReturnDate())){
+			rentalRecordDetails = "Record ID : \t"+ this.getRecordID() +" \n Rent Date \t: " + this.getRentDate() +" \n Estimated Return Date:\t" +this.getEstReturnDate(); 
+			
+		}else {
+			 rentalRecordDetails = "Record ID : \t"+ this.getRecordID() +" \n Rent Date \t: " + this.getRentDate() +" \n Estimated Return Date:\t" +this.getEstReturnDate() +"\n Actual Return Date:\t" +this.getActReturnDate()+"\n Rental fee:\t" + this.getRentFee() +"\n Late Fee: \t" + this.getLateFee(); 
+			
+		}
+		return rentalRecordDetails;
 	}
 
 	/* (non-Javadoc)

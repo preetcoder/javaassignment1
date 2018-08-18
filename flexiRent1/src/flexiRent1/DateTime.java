@@ -155,6 +155,7 @@ public class DateTime
 		
 		
 		// compare 2 dates
+		// 1st must be large
 		public boolean  compareDates(String maintenancedate,String returndate) {
 			try{
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");

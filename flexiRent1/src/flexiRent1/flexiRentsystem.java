@@ -91,22 +91,24 @@ public class flexiRentsystem {
 								
 							
 							case 3:
-								System.out.println("3 enter");
+								obj.checkandCallReturn();
 								break;
 							
 							case 4:
-								System.out.println("4 enter");
+								obj.checkandCallMaintenance();
+								//System.out.println("4 enter");
 								break;
 							
 							case 5:
-								System.out.println("5 enter");
+								//System.out.println("5 enter");
+								obj.checkandCallCompleteMaintenance();
 								break;
 							
 							case 6:
 								
 								// DisplayAllProperties for display
-								//obj.DisplayAllProperties();
-								System.out.println("6 enter");
+								obj.DisplayAllProperties();
+								//System.out.println("6 enter");
 								break;
 							
 							case 7:
@@ -189,7 +191,7 @@ public class flexiRentsystem {
 						pro_no_of_beds = valid.addProprtybeds();
 						int freeIndex = valid.arrayFreeIndex(properties);
 						properties[freeIndex] = new apartment(Pro_ID, pro_street_name, pro_street_no, pro_suburb, pro_no_of_beds, Pro_type);
-					
+						System.out.println("Property Added Successfully");
 					}
 					else {
 						
@@ -207,10 +209,10 @@ public class flexiRentsystem {
 						System.out.println("Property Added Successfully");
 					}
 					
-					int freeIndexchk = valid.arrayFreeIndex(properties);
-					for(int i = freeIndexchk-1; i>=0;i--) {
-						System.out.println(properties[i]);
-					}
+//					int freeIndexchk = valid.arrayFreeIndex(properties);
+//					for(int i = freeIndexchk-1; i>=0;i--) {
+//						System.out.println(properties[i].getDetails());
+//					}
 				}
 				else {
 					System.out.println("Property Already Exists");
@@ -251,7 +253,7 @@ public class flexiRentsystem {
 						// get rentDate and validate it
 						
 						
-						String correctRentDate = valid.addRentDate(inputProID);
+						String correctRentDate = valid.addRentDate(inputProID, "Rent");
 						
 						// validate rentdate 
 						
@@ -340,6 +342,229 @@ public class flexiRentsystem {
 				
 	}
 	
+	public void checkandCallReturn() {
+		
+		// creating object for PropertiesValidations to call validation methods
+		
+		propertyValidations valid = new propertyValidations();
+		
+		// scanner object
+		Scanner getProperty = new Scanner(System.in);
+		
+		// user Input for property ID
+		System.out.println("ENter property ID:");
+		
+		String inputProID = getProperty.nextLine();
+		
+		// not found. print and exit the program
+		if(!valid.propertyExists(properties, inputProID)) {
+			System.out.println("Invalid Property ID");
+		}
+		else {
+			// check availability status of property
+			
+			String InputpropertyStaus = valid.checkPropertyAvailableStatus(properties, inputProID, "status");
+			if("rented".equals(InputpropertyStaus)) {
+			
+				// get rentDate and validate it
+				
+				
+				String correctReturnDate = valid.addRentDate(inputProID, "Return");
+				
+				// get latest rent date of this property 
+				String latestRentDate = valid.checkPropertyAvailableStatus(properties, inputProID, "latestrent");
+				
+				// validate if return date is less than rent date
+				
+				DateTime dateobj = new DateTime();
+				
+				if(dateobj.compareDates(correctReturnDate, latestRentDate)) {
+					//System.out.println("you can rent me");
+					// converting both dates to DateTime so can find the difference in days
+					
+					//String[] latestrentparts = latestRentDate.split("/");
+					
+					String[] correctReturnDateparts = correctReturnDate.split("/");
+					
+					
+					//DateTime datelatestRent = new DateTime(Integer.parseInt(latestrentparts[0]), Integer.parseInt(latestrentparts[1]), Integer.parseInt(latestrentparts[2]));
+					
+					
+					DateTime datecorrectReturnDate = new DateTime(Integer.parseInt(correctReturnDateparts[0]), Integer.parseInt(correctReturnDateparts[1]), Integer.parseInt(correctReturnDateparts[2]));
+					
+					//int diff = dateobj.diffDays(datecorrectReturnDate, datelatestRent);
+					
+					//System.out.println(diff);
+					
+					// call return mathod on index property
+					
+					String indexvalue = valid.checkPropertyAvailableStatus(properties, inputProID, "index");
+					
+					// parsing data to pass on rent()
+					int indexval = Integer.parseInt(indexvalue);
+					
+					boolean rent_status = properties[indexval].returnProperty(datecorrectReturnDate);
+					
+					if(rent_status) {
+						// only 0 index value must be return always
+						System.out.println(properties[indexval].getProperty_type() + " " + properties[indexval].getProperty_id() +" is now returned by customer "+ properties[indexval].records[0].getCustomerID() );
+						
+						System.out.println(properties[indexval].getDetails());
+					}
+					else {
+						System.out.println("Property couldn't be returned.");
+					}
+					
+					
+				
+				}
+				else {
+					System.out.println("Return Date is less than rent date. Check and come back again.");
+					
+				}
+			
+			}
+			else {
+				System.out.println("Property Can't return because not on rent");
+			}
+		}
+	}
+	
+	
+	public void checkandCallMaintenance() {
+		
+		// creating object for PropertiesValidations to call validation methods
+		
+				propertyValidations valid = new propertyValidations();
+				
+				// scanner object
+				Scanner getProperty = new Scanner(System.in);
+				
+				// user Input for property ID
+				System.out.println("ENter property ID:");
+				
+				String inputProID = getProperty.nextLine();
+				
+				// not found. print and exit the program
+				if(!valid.propertyExists(properties, inputProID)) {
+					System.out.println("Invalid Property ID");
+				}
+				else {
+					
+					// property found. check status
+					String InputpropertyStaus = valid.checkPropertyAvailableStatus(properties, inputProID, "status");
+					if("available".equals(InputpropertyStaus)) {
+						
+						// call return mathod on index property
+						
+						String indexvalue = valid.checkPropertyAvailableStatus(properties, inputProID, "index");
+						
+						// parsing data to pass on rent()
+						int indexval = Integer.parseInt(indexvalue);
+						
+						// call performMaintenance
+						boolean perform_maintenenance_status = properties[indexval].performMaintenance();
+						if(perform_maintenenance_status) {
+							if(properties[indexval].getProperty_id().charAt(0) == 'A') {
+								System.out.println("Apartment " + properties[indexval].getProperty_id() + " is now under maintenance.");
+							}
+							else {
+								System.out.println("Premium Suite " + properties[indexval].getProperty_id() + " is now under maintenance.");
+							}
+							
+						}
+					}
+					else{
+						System.out.println("Property couldn't go under Maintenance.");
+					}
+				}
+	}
+	
+	public void checkandCallCompleteMaintenance() {
+		// creating object for PropertiesValidations to call validation methods
+		
+		propertyValidations valid = new propertyValidations();
+		
+		// scanner object
+		Scanner getProperty = new Scanner(System.in);
+		
+		// user Input for property ID
+		System.out.println("ENter property ID:");
+		
+		String inputProID = getProperty.nextLine();
+		
+		// not found. print and exit the program
+		if(!valid.propertyExists(properties, inputProID)) {
+			System.out.println("Invalid Property ID");
+		}
+		else {
+			// property found. check status
+			String InputpropertyStaus = valid.checkPropertyAvailableStatus(properties, inputProID, "status");
+			if("maintenance".equals(InputpropertyStaus)) {
+				
+				// get completionDate and validate it
+				
+				
+				String correctCompletionDate = valid.addRentDate(inputProID, "Maintenance Completion Date(dd/mm/yyyy):");
+				// get last maintenance date of property so validate
+				String property_last_maintenance_date = valid.checkPropertyAvailableStatus(properties, inputProID, "maintenancedate");
+				
+				DateTime dateobj = new DateTime();
+				if(dateobj.compareDates(correctCompletionDate, property_last_maintenance_date)) {
+					
+					// call return mathod on index property
+					
+					String indexvalue = valid.checkPropertyAvailableStatus(properties, inputProID, "index");
+					
+					// parsing data to pass on rent()
+					int indexval = Integer.parseInt(indexvalue);
+					
+					// make dateTime object of string date
+					String[] correctCompletionDateparts = correctCompletionDate.split("/");
+					
+					DateTime datecorrectCompletionDate = new DateTime(Integer.parseInt(correctCompletionDateparts[0]), Integer.parseInt(correctCompletionDateparts[1]), Integer.parseInt(correctCompletionDateparts[2]));
+					
+					
+					// call completeMaintenance
+					boolean perform_complete_maintenenance_status = properties[indexval].completeMaintenance(datecorrectCompletionDate);
+					
+					if(perform_complete_maintenenance_status) {
+						if(properties[indexval].getProperty_id().charAt(0) == 'A') {
+							System.out.println("Apartment " + properties[indexval].getProperty_id() + " has all maintenance completed and ready for rent.");
+						}
+						else {
+							System.out.println("Premium Suite " + properties[indexval].getProperty_id() + " has all maintenance completed and ready for rent.");
+						}
+					}
+					else {
+						System.out.println("Property couldn't complete maintenance.");
+					}
+					
+				}
+				else {
+					System.out.println("completion date must be greater than last maintenance date. Property couldn't complete maintenance. ");
+				}
+			}
+			else {
+				System.out.println("Property couldn't complete maintenance.");
+			}
+		}
+	}
+	
+	public void DisplayAllProperties() {
+		// total properties
+		propertyValidations valid = new propertyValidations();
+		int total_properties  = valid.arrayFreeIndex(properties);
+		//System.out.println(total_properties);
+		if(total_properties > 0) {
+			for(int i = total_properties-1;i>=0 ; i--) {
+				System.out.println(properties[i].getDetails());
+			}
+		}
+		else {
+			System.out.println("No Property Exists.");
+		}
+	}
 	
 
 }
