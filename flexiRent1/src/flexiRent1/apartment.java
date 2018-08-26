@@ -151,7 +151,7 @@ public class apartment extends property{
 			int estd_to_actual_diff = dateobj.diffDays(returnDate, datelatestEstdDateparts);
 			
 			// got difference b/w estd and rent return date
-						int estd_to_rent_diff = dateobj.diffDays(datelatestRent, datelatestEstdDateparts);
+						int estd_to_rent_diff = dateobj.diffDays(datelatestEstdDateparts, datelatestRent);
 						
 			
 			// rent date is less than actual return date
@@ -169,7 +169,7 @@ public class apartment extends property{
 					// property left after estd return date so fine
 					
 					// property on time or before returning
-					System.out.println("Fine");
+					//System.out.println("Fine");
 					if(beds == 1) {
 						
 						// multiplying to 143 for....

@@ -2,6 +2,7 @@
  * 
  */
 package flexiRent1;
+import java.util.*;
 
 public class rentalRecord {
 	
@@ -155,7 +156,7 @@ public class rentalRecord {
 			rentalRecordDetails = "Record ID : \t"+ this.getRecordID() +" \n Rent Date \t: " + this.getRentDate() +" \n Estimated Return Date:\t" +this.getEstReturnDate(); 
 			
 		}else {
-			 rentalRecordDetails = "Record ID : \t"+ this.getRecordID() +" \n Rent Date \t: " + this.getRentDate() +" \n Estimated Return Date:\t" +this.getEstReturnDate() +"\n Actual Return Date:\t" +this.getActReturnDate()+"\n Rental fee:\t" + this.getRentFee() +"\n Late Fee: \t" + this.getLateFee(); 
+			 rentalRecordDetails = "Record ID : \t"+ this.getRecordID() +" \n Rent Date \t: " + this.getRentDate() +" \n Estimated Return Date:\t" +this.getEstReturnDate() +"\n Actual Return Date:\t" +this.getActReturnDate()+"\n Rental fee:\t" + String.format("%1.2f",this.getRentFee()) +"\n Late Fee: \t" + String.format("%1.2f",this.getLateFee()); 
 			
 		}
 		return rentalRecordDetails;
@@ -169,7 +170,7 @@ public class rentalRecord {
 		return "rentalRecord \n \t[getRecordID()=" + getRecordID() + ", \n \t getRentDate()=" + getRentDate()
 				+ ",\n \t getCustomerID()=" + getCustomerID() + ", \n \t getEstReturnDate()=" + getEstReturnDate()
 				+ ", getActReturnDate()=" + getActReturnDate() + ", getRentFee()=" + getRentFee() + ", getLateFee()="
-				+ getLateFee() + ", getDetails()=" + getDetails() + "]";
+				+ String.format("%1.2f",getLateFee()) + ", getDetails()=" + getDetails() + "]";
 	}
 
 	

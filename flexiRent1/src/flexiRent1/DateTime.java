@@ -110,11 +110,18 @@ public class DateTime
 		
 		// my methods to test  validity
 		
-		public boolean dateValidate(String myDate) {
+		public boolean dateValidate(String dat) {
 			 try {
+				 // array of date string
+				 String[] myDate = dat.split("/");
+				 // checking year if true. ParseException doesn't check for year value correctly.
+				 propertyValidations validate = new propertyValidations();
+				 if(!validate.isNumeric(myDate[2])) {
+					 return false;
+				 }
 				 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		            df.setLenient(false);
-		            df.parse(myDate);
+		            df.parse(dat);
 		            return true;
 		        } catch (ParseException e) {
 		            return false;
